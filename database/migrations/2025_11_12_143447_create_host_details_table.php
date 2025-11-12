@@ -1,0 +1,40 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('host_details', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('user_id');
+            $table->string('status')->default('active');
+            $table->string('username', 100);
+            $table->unsignedBigInteger('service_type_id');
+            $table->string('profile_photo');
+            $table->boolean('is_available')->default('true');
+            $table->string('meet_location');
+            $table->string('meet_timezone');
+            $table->boolean('is_public')->default('true');
+            $table->boolean('is_auto_approve')->default('true');
+            $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('service_type_id')->references('id')->on('service_types');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('host_details');
+    }
+};

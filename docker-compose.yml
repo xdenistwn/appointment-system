@@ -1,16 +1,15 @@
 services:
-  mysql:
-    image: mysql:8.0
+  postgres:
+    image: postgres:16
     container_name: appointment_db
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_USER: ${DB_USERNAME}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
-      MYSQL_DATABASE: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
     network_mode: host
     volumes:
-      - appointment_db:/var/lib/mysql
+      - appointment_db:/var/lib/postgresql/data
 
 volumes:
   appointment_db:

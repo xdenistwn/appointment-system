@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('status')->default('active');
             $table->string('username', 100);
             $table->unsignedBigInteger('service_type_id');
-            $table->string('profile_photo');
+            $table->string('profile_photo')->nullable();
             $table->boolean('is_available')->default('true');
             $table->string('meet_location');
             $table->string('meet_timezone');

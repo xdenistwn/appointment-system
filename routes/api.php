@@ -2,7 +2,11 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthenticationController;
 
 Route::prefix('v1')->group(function(){
-    // v1 here
+    Route::post('/register', [AuthenticationController::class, 'register']);
+    Route::post('/resend-otp', [AuthenticationController::class, 'resendOtp']);
+    Route::post('/check-otp-register', [AuthenticationController::class, 'verifyOtp']);
+    Route::post('/verify-register', [AuthenticationController::class, 'verifyRegister']);
 });

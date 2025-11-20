@@ -52,9 +52,73 @@ class AuthenticationService
         return true;
     }
 
-    public function resendOtp($payload): bool
+    public function resendOtp(array $payload): bool
     {
-        $user = User::where('email', $payload['email'])->whereNotNull('otp_register')->first();
+        $user = User::where('email', $payload['email'])->first();
+
+        // otp generator
+        // can be improve later
+        do {
+            $otp = rand(100000, 999999);
+            $otpCount = Otp::where('otp', $otp)->count();
+        } while ($otpCount > 0);
+
+        $user->otps()->where('type', 'registration')->delete();
+        $user->otps()->create([
+            'type' => 'registration',
+            'otp' => $otp,
+            'expired_at' => now()->addDay(),
+            'is_active' => true,
+        ]);
+
         return true;
+    }
+
+    public function verifyOtp(array $payload): bool
+    {
+        $user = User::whereNull('email_verified_at')->where('email', $payload['email'])->first();
+        
+        if (!$user) {
+            return false;
+        }
+
+        $otpCheck = $user->otps()->where('type', 'registration')
+            ->where('otp', $payload['otp'])
+            ->where('is_active', true)
+            ->where('expired_at', '>=', now())
+            ->first();
+
+        if (!$otpCheck) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function verifyRegister(array $payload): bool | string
+    {
+        $user = User::whereNull('email_verified_at')->where('email', $payload['email'])->first();
+        
+        if (!$user) {
+            return false;
+        }
+
+        $otpCheck = $user->otps()->where('type', 'registration')
+            ->where('otp', $payload['otp'])
+            ->where('is_active', true)
+            ->where('expired_at', '>=', now())
+            ->first();
+
+        if (!$otpCheck) {
+            return false;
+        }
+
+        $otpCheck->delete();
+        
+        $user->update([
+            'email_verified_at' => now()
+        ]);
+
+        return $user->createToken(config('app.name'))->plainTextToken;
     }
 }

@@ -23,10 +23,10 @@ class AuthenticationController extends Controller
             'name' => 'required|min:5|max:100',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:3|confirmed',
-            'username' => 'required|email|unique:users,email',
-            'service_type' => 'required|exists:services_types,id',
+            'username' => 'required|unique:host_details,username',
+            'service_type' => 'required|exists:service_types,uuid',
             'meet_location' => 'required|max:100',
-            'meet_timezone' => 'required|max:2'
+            'meet_timezone' => 'required|numeric'
         ]);
 
         if ($validator->fails()) {
@@ -44,7 +44,7 @@ class AuthenticationController extends Controller
     public function resendOtp()
     {
         $validator = Validator::make(request()->all(), [
-            'email' => 'required|email|unique:users,email'
+            'email' => 'required|email|exists:users,email'
         ]);
 
         if ($validator->fails()) {
@@ -57,5 +57,49 @@ class AuthenticationController extends Controller
         return ResponseFormatter::success([
             'is_sent' => true,
         ]);
+    }
+
+    public function verifyOtp()
+    {
+        $validator = Validator::make(request()->all(), [
+            'email' => 'required|email|exists:users,email',
+            'otp' => 'required|exists:otps,otp'
+        ]);
+
+        if ($validator->fails()) {
+            return ResponseFormatter::error(400, $validator->errors());
+        }
+
+        $payload = $validator->validated();
+
+        if ($this->authenticationService->verifyOtp($payload)) {
+            return ResponseFormatter::success([
+                'is_sent' => true,
+            ]);
+        }
+
+        return ResponseFormatter::error(400, 'Invalid OTP');
+    }
+
+    public function verifyRegister()
+    {
+        $validator = Validator::make(request()->all(), [
+            'email' => 'required|email|exists:users,email',
+            'otp' => 'required|exists:otps,otp'
+        ]);
+
+        if ($validator->fails()) {
+            return ResponseFormatter::error(400, $validator->errors());
+        }
+
+        $payload = $validator->validated();
+        
+        if ($token = $this->authenticationService->verifyRegister($payload)) {
+            return ResponseFormatter::success([
+                'token' => $token,
+            ]);
+        }
+
+        return ResponseFormatter::error(400, 'Invalid OTP');
     }
 }

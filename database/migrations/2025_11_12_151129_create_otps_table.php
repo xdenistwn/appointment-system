@@ -16,7 +16,7 @@ return new class extends Migration
             $table->morphs('otpable');
             $table->string('type');
             $table->string('otp');
-            $table->time('expired_at');
+            $table->timestamp('expired_at');
             $table->boolean('is_active')->default('true');
             $table->timestamps();
         });

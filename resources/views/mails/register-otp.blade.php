@@ -1,5 +1,3 @@
-@section('content')
-    Hi {{ $user->name }},<br>
+Hi {{ $user->name }},<br>
 
-    Ini adalah OTP Register anda: {{ $otp }}
-@endsection
+Ini adalah OTP Register anda: {{ $otp }}
